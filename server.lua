@@ -260,7 +260,7 @@ ESX.RegisterServerCallback(GetCurrentResourceName()..':retrieveJobVehicles', fun
         'SELECT * FROM owned_vehicles WHERE type = @type AND job = @job'
     end 
 
-	MySQL.Async.fetchAll('SELECT * FROM owned_vehicles WHERE owner = @owner AND type = @type AND job = @job', {
+	MySQL.Async.fetchAll(sqlstring, {
 		['@owner'] = xPlayer.identifier,
 		['@type'] = type,
 		['@job'] = xPlayer.job.name
