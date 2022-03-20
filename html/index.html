@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+        
+        <link rel="stylesheet" href="style.css">
+        
+    </head>
+    <body>
+		<div id='app'>
+            
+            <h1 class="centered label-txt">AUTÓKERESKEDÉS</h1>
+            <div class="centered">
+                <div class="input-group flex-nowrap search">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="addon-wrapping"><i class="bi bi-search"></i></span>
+                    </div>
+                    <input type="text" v-model="search" class="form-control" placeholder="autó neve, ára vagy kategóriája" aria-describedby="addon-wrapping">
+                </div>
+            </div>
+
+            <button class="btn close-btn" @click="close()"><i class="bi bi-x-circle"></i></button>
+
+            <div class="d-flex align-content-start flex-wrap car-list">
+                <div v-for="car in filteredList" :key="car.model" class="card car">
+                    <img :src="car.img" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">{{car.label}}</h5>
+                        <p class="card-text">Ár: <strong>{{car.price}}{{currency}}</strong></p>
+                        <p class="card-text">Kategória: <strong>{{car.category}}</strong></p>
+                        <div class="btn-group" role="group" aria-label="First group">
+                            <button type="button" class="btn buy-btn" @click="buy(car.model)"><i class="bi bi-cash"></i> Készpénz</button>
+                            <button v-if="enableBank" type="button" class="btn buy-btn" @click="buybank(car.model)"><i class="bi bi-bank"></i> Bank</button>
+                            <button v-if="enableFaction" type="button" class="btn buy-btn" @click="buyfaction(car.model)"><i class="bi bi-people"></i> Frakció</button>
+                            <button v-if="enableTest" type="button" class="btn buy-btn" @click="test(car.model)"><i class="bi bi-award"></i> Tesztelés</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+		</div>
+
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.31/vue.global.prod.min.js"></script>
+        <script src="index.js"></script>
+
+	</body>
+</html>
