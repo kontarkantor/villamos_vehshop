@@ -257,7 +257,7 @@ ESX.RegisterServerCallback(GetCurrentResourceName()..':retrieveJobVehicles', fun
     local sqlstring = 'SELECT * FROM owned_vehicles WHERE owner = @owner AND type = @type AND job = @job'
 
     if Config.SharedJobVehicles then 
-        'SELECT * FROM owned_vehicles WHERE type = @type AND job = @job'
+        sqlstring = 'SELECT * FROM owned_vehicles WHERE type = @type AND job = @job'
     end 
 
 	MySQL.Async.fetchAll(sqlstring, {
