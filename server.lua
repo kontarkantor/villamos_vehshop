@@ -109,7 +109,8 @@ end)
 
 RegisterNetEvent('villamos_vehshop:BuyVehicle')
 AddEventHandler('villamos_vehshop:BuyVehicle', function(model, account)
-    local xPlayer = ESX.GetPlayerFromId(source)
+    local src = source 
+    local xPlayer = ESX.GetPlayerFromId(src)
     local price 
 
     for i=1, #vehicles, 1 do
@@ -140,7 +141,8 @@ end)
 RegisterNetEvent('villamos_vehshop:BuyVehicleFaction')
 AddEventHandler('villamos_vehshop:BuyVehicleFaction', function(model)
     if Config.EnableFaction then
-        local xPlayer = ESX.GetPlayerFromId(source)
+        local src = source 
+        local xPlayer = ESX.GetPlayerFromId(src)
         local faction
         local price 
 
@@ -251,7 +253,7 @@ ESX.RegisterServerCallback('villamos_vehshop:GeneratePlate', function(source, cb
 end)
 
 --for esx jobs--
-ESX.RegisterServerCallback(GetCurrentResourceName()..':retrieveJobVehicles', function(source, cb, type)
+ESX.RegisterServerCallback('esx_vehicleshop:retrieveJobVehicles', function(source, cb, type)
 	local xPlayer = ESX.GetPlayerFromId(source)
 
     local sqlstring = 'SELECT * FROM owned_vehicles WHERE owner = @owner AND type = @type AND job = @job'
@@ -269,8 +271,8 @@ ESX.RegisterServerCallback(GetCurrentResourceName()..':retrieveJobVehicles', fun
 	end)
 end)
 
-RegisterServerEvent(GetCurrentResourceName()..':setJobVehicleState')
-AddEventHandler(GetCurrentResourceName()..':setJobVehicleState', function(plate, state)
+RegisterServerEvent('esx_vehicleshop:setJobVehicleState')
+AddEventHandler('esx_vehicleshop:setJobVehicleState', function(plate, state)
 	local xPlayer = ESX.GetPlayerFromId(source)
 
 	MySQL.Async.execute('UPDATE owned_vehicles SET `stored` = @stored WHERE plate = @plate AND job = @job', {
