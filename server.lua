@@ -1,7 +1,4 @@
-ESX = nil
 local vehicles = {}
-
-TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
 
 
 AddEventHandler('onResourceStart', function(res)
