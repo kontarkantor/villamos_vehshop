@@ -1,32 +1,31 @@
-ESX = nil
 local isInShop = false
 local testing = false
 
 RegisterNUICallback('exit', function(data, cb)
-    SetNuiSate(false)
+    SetNuiState(false)
     cb('ok')
 end)
 
 RegisterNUICallback('buy', function(data, cb)
     TriggerServerEvent('villamos_vehshop:BuyVehicle', data.model, 'money')
-    SetNuiSate(false)
+    SetNuiState(false)
     cb('ok')
 end)
 
 RegisterNUICallback('buybank', function(data, cb)
     TriggerServerEvent('villamos_vehshop:BuyVehicle', data.model, 'bank')
-    SetNuiSate(false)
+    SetNuiState(false)
     cb('ok')
 end)
 
 RegisterNUICallback('buyfaction', function(data, cb)
     TriggerServerEvent('villamos_vehshop:BuyVehicleFaction', data.model)
-    SetNuiSate(false)
+    SetNuiState(false)
     cb('ok')
 end)
 
 RegisterNUICallback('test', function(data, cb)
-    SetNuiSate(false)
+    SetNuiState(false)
     cb('ok')
     if Config.EnableTest and not testing then 
         local hash = GetHashKey(data.model)
@@ -35,22 +34,22 @@ RegisterNUICallback('test', function(data, cb)
         end 
         while not HasModelLoaded(hash) do 
             RequestModel(hash)
-            Citizen.Wait(10)
+            Wait(10)
         end 
         local vehicle = CreateVehicle(hash, Config.TestCoords.x, Config.TestCoords.y, Config.TestCoords.z, Config.TestCoords.h, false, false)
-        Citizen.Wait(1000)
-        TaskWarpPedIntoVehicle(GetPlayerPed(-1), vehicle, -1)
+        Wait(1000)
+        TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
         SetModelAsNoLongerNeeded(hash)
         local start = GetGameTimer()
         testing = true 
-        Citizen.CreateThread(function()
+        CreateThread(function()
             while testing do 
-                Citizen.Wait(0)
+                Wait(0)
                 local rem = Config.TestTime - (GetGameTimer() - start)
                 if rem <= 0 then 
                     testing = false 
                 end 
-                if GetVehiclePedIsIn(GetPlayerPed(-1), false) ~= vehicle then 
+                if GetVehiclePedIsIn(PlayerPedId(), false) ~= vehicle then 
                     testing = false
                 end 
                 SetTextFont(4)
@@ -67,7 +66,7 @@ RegisterNUICallback('test', function(data, cb)
     end 
 end)
 
-function SetNuiSate(state)
+function SetNuiState(state)
     SetNuiFocus(state, state)
 	isInShop = state
 
@@ -81,12 +80,11 @@ function Notify(msg)
     ESX.ShowNotification(msg)     
 end 
 
-Citizen.CreateThread(function()
-    Citizen.Wait(2000)
+CreateThread(function()
+    Wait(2000)
     
-    while ESX == nil do
-		TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
-		Citizen.Wait(0)
+    while not ESX or not ESX.PlayerLoaded do
+		Wait(10)
 	end
 
     AddTextEntry('vehshop_open_msg', '~INPUT_PICKUP~ az autókereskedés megnyitáshoz')
@@ -104,6 +102,7 @@ Citizen.CreateThread(function()
     })
     TriggerEvent('chat:addSuggestion', '/vsphoto', 'Képek készítése az autókerben lévő kocsikhoz', {})
     
+    Wait(5000)
 
     SendNUIMessage({
 		type = "config",
@@ -124,9 +123,9 @@ Citizen.CreateThread(function()
 
     while true do 
 
-        local coords = GetEntityCoords(GetPlayerPed(-1))
+        local coords = GetEntityCoords(PlayerPedId())
         local sleep = 500
-        local dis = GetDistanceBetweenCoords(coords, Config.ShopCoords.x, Config.ShopCoords.y, Config.ShopCoords.z, true)
+        local dis = #(coords - vector3(Config.ShopCoords.x, Config.ShopCoords.y, Config.ShopCoords.z))
 
         if dis < 20 then 
             sleep = 1
@@ -135,16 +134,16 @@ Citizen.CreateThread(function()
             if dis < 2.0 then 
                 DisplayHelpTextThisFrame('vehshop_open_msg')
                 if IsControlJustReleased(0, 38) then
-                    SetNuiSate(true)
+                    SetNuiState(true)
                 end    
             elseif isInShop then 
-                SetNuiSate(false)
+                SetNuiState(false)
             end 
         elseif isInShop then 
-            SetNuiSate(false)
+            SetNuiState(false)
         end 
 
-        Citizen.Wait(sleep)
+        Wait(sleep)
 
     end 
 
@@ -210,23 +209,29 @@ AddEventHandler('villamos_vehshop:TakePhotos', function(vehicles)
                 SetModelAsNoLongerNeeded(hash)
 
                 local shoting = true 
-                Citizen.Wait(1000)
+                Wait(1000)
 
                 exports['screenshot-basic']:requestScreenshotUpload(Config.Webhook, "files[]", function(data)
                     local resp = json.decode(data)
+                    if not resp then 
+                        Notify("Hiba feltöltés közben!")
+                        shoting = false
+                        return
+                    end 
                     local img = resp.attachments[1].proxy_url
                     if not img then 
                         Notify("Hiba feltöltés közben!")
-                    else 
-                        TriggerServerEvent('villamos_vehshop:SavePhoto', model, img)
+                        shoting = false
+                        return
                     end 
+                    TriggerServerEvent('villamos_vehshop:SavePhoto', model, img)
                     shoting = false
                 end)
 
                 while shoting do 
-                    Citizen.Wait(100)
+                    Wait(100)
                 end 
-                Citizen.Wait(2000)
+                Wait(2000)
                 DeleteEntity(car)
             else 
                 Notify("Nem létező model: " .. model)
@@ -235,7 +240,7 @@ AddEventHandler('villamos_vehshop:TakePhotos', function(vehicles)
 
         DisplayHud(true)
         DisplayRadar(true)
-        FreezeEntityPosition(GetPlayerPed(-1), false)
+        FreezeEntityPosition(PlayerPedId(), false)
         RenderScriptCams(false)
         DestroyCam(cam, true)
         SetCamActive(cam, false)
@@ -250,7 +255,7 @@ function GeneratePlate()
         p = plate
     end)
     while not p do 
-        Citizen.Wait(10)
+        Wait(10)
     end 
     return p
 end 
