@@ -278,3 +278,9 @@ AddEventHandler('esx_vehicleshop:setJobVehicleState', function(plate, state)
 		['@job'] = xPlayer.job.name
 	})
 end)
+
+ESX.RegisterServerCallback('esx_vehicleshop:isPlateTaken', function (source, cb, plate)
+    palteTaken(plate, function(taken)
+	cb(taken)
+    end)
+end)
