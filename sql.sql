@@ -1,4 +1,4 @@
-CREATE TABLE `owned_vehicles` (
+CREATE TABLE IF NOT EXISTS `owned_vehicles` (
 	`owner` varchar(60) NOT NULL,
 	`plate` varchar(12) NOT NULL,
 	`vehicle` longtext NOT NULL,
@@ -10,11 +10,11 @@ CREATE TABLE `owned_vehicles` (
 );
 
 CREATE TABLE `vehicles` (
-	`name` varchar(60) NOT NULL,
-	`model` varchar(60) NOT NULL,
-	`price` int(11) NOT NULL,
-    `category` varchar(60) NOT NULL,
-	`image` longtext DEFAULT NULL,
-
-	PRIMARY KEY (`model`)
+	`model` VARCHAR(60) NOT NULL,
+	`shop` VARCHAR(60) NULL DEFAULT NULL,
+	`name` VARCHAR(60) NOT NULL,
+	`price` INT(11) NOT NULL,
+	`category` VARCHAR(60) NULL DEFAULT NULL,
+	`image` TEXT NULL DEFAULT NULL
+	UNIQUE INDEX `car` (`model`, `shop`) USING BTREE
 );

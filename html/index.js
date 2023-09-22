@@ -3,12 +3,28 @@ const App = Vue.createApp({
       return {
         cars : [
         ],
-        currency : "$",
-        enableBank : true,
-        enableTest : true,
-        enableFaction : true,
 
-        search : ""
+        shopdata: {
+            money:0,
+            bank:0,
+            society:0,
+            test:true
+        },
+
+        name:"Car Dealership",
+
+        locales: {
+            nui_currency:"$",
+            nui_search:"Search for car name, category or price",
+            nui_cash:"Cash",
+            nui_bank:"Bank",
+            nui_society:"Faction",
+            nui_test:"Test"
+        },
+
+        search : "",
+
+        opened:false
       }
     },
     computed: {
@@ -23,6 +39,30 @@ const App = Vue.createApp({
         }
     },
     methods: {
+        haveMoney(price, moneytype) {
+            if (!this.shopdata[moneytype]) return "#a83432"
+            if (this.shopdata[moneytype] >= price) return "#32a852"
+            return "#a83432"
+        },
+        onMessage(event) {
+            if (event.data.type == "show") {
+                const appelement = document.getElementById("app");
+                if (event.data.enable) {
+                    appelement.style.display = "block";
+                    appelement.style.animation = "hopin 0.7s";
+                    this.opened = true;
+                    this.shopdata = event.data.shopdata;
+                    this.cars = event.data.cars;
+                    this.name = event.data.name;
+                } else {
+                    appelement.style.animation = "hopout 0.6s";
+                    this.opened = false;
+                    setTimeout(() => {
+                        if (!this.opened) appelement.style.display = "none";
+                    }, 500);
+                }
+            }
+        },
         close() {
             fetch(`https://${GetParentResourceName()}/exit`);
         },
@@ -59,20 +99,10 @@ const App = Vue.createApp({
             });
         }
     }, 
-    mounted() {
-        var _this = this;
-        window.addEventListener('message', function(event) {
-            if (event.data.type == "show") {
-                document.body.style.display = event.data.enable ? "block" : "none";
-            } else if (event.data.type == "config") {
-                _this.enableBank = event.data.bank;
-                _this.enableTest = event.data.test;
-                _this.enableFaction = event.data.faction;
-                _this.currency = event.data.currency;
-            } 
-            else if (event.data.type == "set") {
-                _this.cars = event.data.cars;
-            }
-        });
+    async mounted() {
+        window.addEventListener('message', this.onMessage);
+        var response = await fetch(`https://${GetParentResourceName()}/locales`);
+        var locales = await response.json();
+        this.locales = locales;
     }
 }).mount('#app');

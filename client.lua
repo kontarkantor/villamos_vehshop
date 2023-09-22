@@ -1,261 +1,327 @@
-local isInShop = false
+local openedShop = false
 local testing = false
+local shops = {}
+local blips = {}
+
+CreateThread(function()
+    while not ESX or not ESX.PlayerData or not ESX.PlayerData.job do 
+        Wait(10)
+    end 
+
+    TriggerEvent('chat:addSuggestion', '/vsadd', _U("command_vsadd"), {
+        { name="shop", help=_U("command_shop") },
+        { name="model", help=_U("command_model") },
+        { name="price", help=_U("command_price") },
+        { name="category", help=_U("command_category") },
+        { name="name", help=_U("command_name") },
+    })
+    TriggerEvent('chat:addSuggestion', '/vsdel', _U("command_vsdel"), {
+        { name="shop", help=_U("command_shop") },
+        { name="model", help=_U("command_model") }
+    })
+    TriggerEvent('chat:addSuggestion', '/vsphoto', _U("command_vsphoto"), {
+        { name="shop", help=_U("command_shop") }
+    })
+    TriggerEvent('chat:addSuggestion', '/vsrefresh', _U("command_vsrefresh"), {})
+    TriggerEvent('chat:addSuggestion', '/vsget', _U("command_vsget"), {})
+    
+    RefreshShops()
+
+    while true do 
+        local sleep = 1000
+        local coords = GetEntityCoords(PlayerPedId())
+        if not openedShop then 
+            for shop, data in pairs(shops) do 
+                local dis = #(coords - data.coords)
+                if dis < 20 then 
+                    sleep = 1
+                    DrawMarker(6, data.coords, 0.0, 0.0, 0.0, -90.0, 0.0, 0.0, 2.0, 2.0, 2.0, 0, 155, 20, 100, false, true, 2, false, false, false, false)
+                    DrawMarker(36, data.coords+vector3(0.0, 0.0, 0.6), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0, 155, 20, 100, false, true, 2, false, false, false, false)
+                    if dis < 2.0 then 
+                        AddTextEntry('vehshop_open_msg', _U("open_msg", data.label))
+                        DisplayHelpTextThisFrame('vehshop_open_msg')
+                        if IsControlJustReleased(0, 38) then
+                            OpenShop(shop)
+                        end
+                    end 
+                end 
+            end
+        end  
+        Wait(sleep)
+    end 
+end)
+
+RegisterNetEvent("esx:setJob", function()
+    RefreshShops()
+end)
+
+function RefreshShops()
+    for _, blip in pairs(blips) do 
+        RemoveBlip(blip)
+    end 
+    blips = {}
+    shops = {}
+    for shop, data in pairs(Config.Shops) do 
+        if HaveJob(data.job) then 
+            shops[shop] = { coords = data.coords, label = data.label }
+            if data.blip then 
+                local blip = AddBlipForCoord(data.coords)
+                SetBlipSprite(blip, data.blip.sprite)
+                SetBlipScale(blip, 1.0)
+                SetBlipColour(blip, data.blip.color)
+                SetBlipAsShortRange(blip, true)
+                BeginTextCommandSetBlipName('STRING')
+                AddTextComponentSubstringPlayerName(data.label)
+                EndTextCommandSetBlipName(blip)
+                blips[#blips+1] = blip
+            end 
+        end 
+    end 
+end 
+
+function HaveJob(jobobj)
+    if not jobobj then return true end 
+    if not jobobj[ESX.PlayerData.job.name] then return false end 
+    for i=1, #jobobj[ESX.PlayerData.job.name], 1 do
+        if jobobj[ESX.PlayerData.job.name][i] == ESX.PlayerData.job.grade_name then 
+            return true 
+        end 
+    end 
+    return false 
+end 
+
+
+function OpenShop(shop)
+    if not Config.Shops[shop] then return end 
+    openedShop = shop
+    ESX.TriggerServerCallback("villamos_vehshop:openShop", function(cars, money) 
+        if not cars then 
+            openedShop = false 
+            return 
+        end 
+        money.test = Config.Shops[shop].testcoords and true or false
+        SetNuiFocus(true, true)
+        SendNUIMessage({
+            type = "show",
+            enable = true,
+            shopdata = money,
+            cars = cars,
+            name = Config.Shops[shop].label
+        })
+    end, shop)
+end 
+
+function CloseShop()
+    SetNuiFocus(false, false)
+    openedShop = false
+    SendNUIMessage({
+        type = "show",
+        enable = false
+    })
+end 
+
+
+RegisterNUICallback('locales', function(data, cb)
+    local nuilocales = {}
+    if not Config.Locale or not Locales[Config.Locale] then return print("^1SCRIPT ERROR: Invilaid locales configuartion") end
+    for k, v in pairs(Locales[Config.Locale]) do 
+        if string.find(k, "nui") then 
+            nuilocales[k] = v
+        end 
+    end 
+    cb(nuilocales)
+end)
 
 RegisterNUICallback('exit', function(data, cb)
-    SetNuiState(false)
-    cb('ok')
+    CloseShop()
+    cb(1)
 end)
 
 RegisterNUICallback('buy', function(data, cb)
-    TriggerServerEvent('villamos_vehshop:BuyVehicle', data.model, 'money')
-    SetNuiState(false)
-    cb('ok')
+    if not openedShop then 
+        CloseShop()
+        return cb(1)
+    end 
+    TriggerServerEvent('villamos_vehshop:buyVehicle', openedShop, data.model, 'money')
+    CloseShop()
+    cb(1)
 end)
 
 RegisterNUICallback('buybank', function(data, cb)
-    TriggerServerEvent('villamos_vehshop:BuyVehicle', data.model, 'bank')
-    SetNuiState(false)
-    cb('ok')
+    if not openedShop then 
+        CloseShop()
+        return cb(1)
+    end 
+    TriggerServerEvent('villamos_vehshop:buyVehicle', openedShop, data.model, 'bank')
+    CloseShop()
+    cb(1)
 end)
 
 RegisterNUICallback('buyfaction', function(data, cb)
-    TriggerServerEvent('villamos_vehshop:BuyVehicleFaction', data.model)
-    SetNuiState(false)
-    cb('ok')
+    if not openedShop then 
+        CloseShop()
+        return cb(1)
+    end 
+    TriggerServerEvent('villamos_vehshop:buyVehicleFaction', openedShop, data.model)
+    CloseShop()
+    cb(1)
 end)
 
 RegisterNUICallback('test', function(data, cb)
-    SetNuiState(false)
-    cb('ok')
-    if Config.EnableTest and not testing then 
-        local hash = GetHashKey(data.model)
-        if not IsModelInCdimage(hash) then 
-            return
-        end 
-        while not HasModelLoaded(hash) do 
-            RequestModel(hash)
-            Wait(10)
-        end 
-        local vehicle = CreateVehicle(hash, Config.TestCoords.x, Config.TestCoords.y, Config.TestCoords.z, Config.TestCoords.h, false, false)
-        Wait(1000)
-        TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
-        SetModelAsNoLongerNeeded(hash)
-        local start = GetGameTimer()
-        testing = true 
-        CreateThread(function()
-            while testing do 
-                Wait(0)
-                local rem = Config.TestTime - (GetGameTimer() - start)
-                if rem <= 0 then 
-                    testing = false 
-                end 
-                if GetVehiclePedIsIn(PlayerPedId(), false) ~= vehicle then 
-                    testing = false
-                end 
-                SetTextFont(4)
-                SetTextScale(0.5, 0.5)
-                SetTextColour(255, 255, 255, 255)
-                SetTextCentre(1)
-                BeginTextCommandDisplayText("STRING")
-                AddTextComponentString("Hátra van ~p~"..math.floor(rem/1000).." mp")
-                EndTextCommandDisplayText(0.5, 0.9)
-            end 
-            ESX.Game.DeleteVehicle(vehicle)
-            ESX.Game.Teleport(GetPlayerPed(-1), Config.ShopCoords)
-        end)
+    if not openedShop then 
+        CloseShop()
+        return cb(1)
     end 
-end)
-
-function SetNuiState(state)
-    SetNuiFocus(state, state)
-	isInShop = state
-
-	SendNUIMessage({
-		type = "show",
-		enable = state
-	})
-end
-
-function Notify(msg)
-    ESX.ShowNotification(msg)     
-end 
-
-CreateThread(function()
-    Wait(2000)
-    
-    while not ESX or not ESX.PlayerLoaded do
-		Wait(10)
-	end
-
-    AddTextEntry('vehshop_open_msg', '~INPUT_PICKUP~ az autókereskedés megnyitáshoz')
-
-    TriggerServerEvent('villamos_vehshop:Login')
-
-    TriggerEvent('chat:addSuggestion', '/vsadd', 'Kocsi berakása az autókerbe', {
-        { name="model", help="A kocsi modelle" },
-        { name="price", help="A kocsi ára" },
-        { name="category", help="A kocsi kategóriája" },
-        { name="name", help="A kocsi neve" },
-    })
-    TriggerEvent('chat:addSuggestion', '/vsdel', 'Kocsi kivétele az autókerből', {
-        { name="model", help="A kocsi modelle" }
-    })
-    TriggerEvent('chat:addSuggestion', '/vsphoto', 'Képek készítése az autókerben lévő kocsikhoz', {})
-    
-    Wait(5000)
-
-    SendNUIMessage({
-		type = "config",
-		bank = Config.EnableBank,
-		test = Config.EnableTest,
-        faction = Config.EnableFaction,
-        currency = Config.Currency
-	})
-
-    local blip = AddBlipForCoord(Config.ShopCoords.x, Config.ShopCoords.y, Config.ShopCoords.z)
-	SetBlipSprite (blip, 326)
-	SetBlipScale  (blip, 1.0)
-	SetBlipColour (blip, 2)
-	SetBlipAsShortRange(blip, true)
-	BeginTextCommandSetBlipName('STRING')
-	AddTextComponentSubstringPlayerName("Autókereskedés")
-	EndTextCommandSetBlipName(blip)
-
-    while true do 
-
-        local coords = GetEntityCoords(PlayerPedId())
-        local sleep = 500
-        local dis = #(coords - vector3(Config.ShopCoords.x, Config.ShopCoords.y, Config.ShopCoords.z))
-
-        if dis < 20 then 
-            sleep = 1
-            DrawMarker(6, Config.ShopCoords.x, Config.ShopCoords.y, Config.ShopCoords.z-0.6, 0.0, 0.0, 0.0, -90.0, 0.0, 0.0, 2.0, 2.0, 2.0, 0, 155, 20, 100, false, true, 2, false, false, false, false)
-            DrawMarker(36, Config.ShopCoords.x, Config.ShopCoords.y, Config.ShopCoords.z, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0, 155, 20, 100, false, true, 2, false, false, false, false)
-            if dis < 2.0 then 
-                DisplayHelpTextThisFrame('vehshop_open_msg')
-                if IsControlJustReleased(0, 38) then
-                    SetNuiState(true)
-                end    
-            elseif isInShop then 
-                SetNuiState(false)
-            end 
-        elseif isInShop then 
-            SetNuiState(false)
-        end 
-
-        Wait(sleep)
-
+    local testcoords = Config.Shops[openedShop].testcoords
+    if not testcoords then 
+        return cb(1)
     end 
-
-end)
-
-RegisterNetEvent('villamos_vehshop:SetCars')
-AddEventHandler('villamos_vehshop:SetCars', function(data)
-	SendNUIMessage({
-		type = "set",
-		cars = data,
-	})
-end)
-
-RegisterNetEvent('villamos_vehshop:Notify')
-AddEventHandler('villamos_vehshop:Notify', function(msg)
-	Notify(msg)
-end)
-
-RegisterNetEvent('villamos_vehshop:SpawnCar')
-AddEventHandler('villamos_vehshop:SpawnCar', function(model, plate)
-	ESX.Game.SpawnVehicle(GetHashKey(model), Config.SpawnCarCoords, Config.SpawnCarCoords.h, function(vehicle)
-        local ped = GetPlayerPed(-1)
-        TaskWarpPedIntoVehicle(ped, vehicle, -1)
-        SetVehicleNumberPlateText(vehicle, plate)
-    end)
-end)
-
-RegisterNetEvent('villamos_vehshop:TakePhotos')
-AddEventHandler('villamos_vehshop:TakePhotos', function(vehicles)
-	if not Config.Webhook or Config.Webhook == "WEBHOOK" and GetResourceState("screenshot-basic") == "started" then 
-        Notify("Nincs beállítva webhook vagy nincs bent screenshot-basic, így nem lehet fotókat készíteni!")
-    else 
-        Notify("Elkészítjük a fényképeket, kérlek ne csinálj most semmit!")
-        DisplayHud(false)
-        DisplayRadar(false)
-        FreezeEntityPosition(GetPlayerPed(-1), true)
-
-        local cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
-        SetCamCoord(cam, Config.ShoowRoomCam.x, Config.ShoowRoomCam.y, Config.ShoowRoomCam.z)
-        SetCamRot(cam, Config.ShoowRoomCam.xr, Config.ShoowRoomCam.yr, Config.ShoowRoomCam.zr, 2)
-        SetCamActive(cam, true)
-        RenderScriptCams(true, false, 0, true, false)
-
-        
-        for _, veh in pairs(vehicles) do 
-            local model = veh.model
-            local hash = GetHashKey(model)
-
-            if IsModelInCdimage(hash) then 
-                if not HasModelLoaded(hash) then
-                    RequestModel(hash)
-                    while not HasModelLoaded(hash) do
-                        Citizen.Wait(0)
-                    end
-                end
-
-                local car = CreateVehicle(hash, Config.ShoowRoomCoords.x, Config.ShoowRoomCoords.y, Config.ShoowRoomCoords.z, Config.ShoowRoomCoords.h, false, true, false)
-                while not DoesEntityExist(car) do 
-                    Citizen.Wait(100)
-                end 
-                SetModelAsNoLongerNeeded(hash)
-                FreezeEntityPosition(car, true)
-                SetModelAsNoLongerNeeded(hash)
-
-                local shoting = true 
-                Wait(1000)
-
-                exports['screenshot-basic']:requestScreenshotUpload(Config.Webhook, "files[]", function(data)
-                    local resp = json.decode(data)
-                    if not resp then 
-                        Notify("Hiba feltöltés közben!")
-                        shoting = false
-                        return
-                    end 
-                    local img = resp.attachments[1].proxy_url
-                    if not img then 
-                        Notify("Hiba feltöltés közben!")
-                        shoting = false
-                        return
-                    end 
-                    TriggerServerEvent('villamos_vehshop:SavePhoto', model, img)
-                    shoting = false
-                end)
-
-                while shoting do 
-                    Wait(100)
-                end 
-                Wait(2000)
-                DeleteEntity(car)
-            else 
-                Notify("Nem létező model: " .. model)
-            end 
-        end 
-
-        DisplayHud(true)
-        DisplayRadar(true)
-        FreezeEntityPosition(PlayerPedId(), false)
-        RenderScriptCams(false)
-        DestroyCam(cam, true)
-        SetCamActive(cam, false)
-        Notify("Elkészítettük a fényképeket!")
-        TriggerServerEvent('villamos_vehshop:ReqUpdate')
+    local testtime = Config.Shops[openedShop].testtime
+    local shopcoords = Config.Shops[openedShop].coords
+    CloseShop()
+    cb(1)
+    local hash = GetHashKey(data.model)
+    if not IsModelInCdimage(hash) then 
+        return print("^1SCRIPT ERROR: Invalid model: "..data.model)
     end 
-end)
-
-function GeneratePlate()
-    local p 
-    ESX.TriggerServerCallback('villamos_vehshop:GeneratePlate', function(plate) 
-        p = plate
-    end)
-    while not p do 
+    while not HasModelLoaded(hash) do 
+        RequestModel(hash)
         Wait(10)
     end 
-    return p
-end 
+    local vehicle = CreateVehicle(hash, testcoords, false, true)
+    TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
+    SetModelAsNoLongerNeeded(hash)
+    local start = GetGameTimer()
+    testing = true 
+    CreateThread(function()
+        while testing do 
+            Wait(0)
+            local rem = testtime - (GetGameTimer() - start)
+            if rem <= 0 or GetVehiclePedIsIn(PlayerPedId(), false) ~= vehicle then 
+                testing = false 
+            end 
+            SetTextFont(4)
+            SetTextScale(0.5, 0.5)
+            SetTextColour(255, 255, 255, 255)
+            SetTextCentre(1)
+            BeginTextCommandDisplayText("STRING")
+            AddTextComponentString(_U("test_msg", math.floor(rem/1000)))
+            EndTextCommandDisplayText(0.5, 0.9)
+        end 
+        DeleteVehicle(vehicle)
+        SetEntityCoords(PlayerPedId(), shopcoords, false, false, false, false)
+    end)
+end)
+
+RegisterNetEvent('villamos_vehshop:spawnCar', function(coords, model, plate)
+    local hash = GetHashKey(model)
+    if not IsModelInCdimage(hash) then 
+        return print("^1SCRIPT ERROR: Invalid model: "..model)
+    end 
+    while not HasModelLoaded(hash) do 
+        RequestModel(hash)
+        Wait(10)
+    end 
+    local vehicle = CreateVehicle(hash, coords, true, true)
+    SetVehicleNumberPlateText(vehicle, plate)
+    TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
+    SetModelAsNoLongerNeeded(hash)
+end)
+
+RegisterCommand("vsget", function(s, a, r)
+    local coords = GetEntityCoords(PlayerPedId())
+    local closestshop, closestdis = false, 20
+    for shop, data in pairs(Config.Shops) do 
+        local dis = #(coords - data.coords)
+        if dis < closestdis then 
+            closestshop = shop 
+            closestdis = dis
+        end 
+    end 
+    if not closestshop then 
+        return Config.Notify(_U("no_shop_near"))
+    end 
+    Config.Notify(_U("closest_shop", closestshop))
+end)
+
+RegisterNetEvent("villamos_vehshop:takePhotos", function(shop, webhook, cars) 
+    Config.Notify(_U("taking_photos"))
+    DisplayHud(false)
+    DisplayRadar(false)
+    FreezeEntityPosition(PlayerPedId(), true)
+
+    local cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
+    SetCamCoord(cam, Config.Shops[shop].showroomcam)
+    SetCamActive(cam, true)
+    RenderScriptCams(true, false, 0, true, false)
+
+    for i=1, #cars, 1 do 
+        local model = cars[i].model
+        local hash = GetHashKey(model)
+        if IsModelInCdimage(hash) and IsModelValid(hash) then 
+            if not HasModelLoaded(hash) then
+                RequestModel(hash)
+                while not HasModelLoaded(hash) do
+                    Wait(0)
+                end
+            end
+
+            local vehicle = CreateVehicle(hash, Config.Shops[shop].showroom, false, true)
+            SetModelAsNoLongerNeeded(hash)
+            FreezeEntityPosition(vehicle, true)
+            PointCamAtEntity(cam, vehicle, 0.0, 0.0, 0.0, true)
+            SetFocusEntity(vehicle)
+
+            local p = promise.new()
+            Wait(500)
+
+            exports['screenshot-basic']:requestScreenshotUpload(webhook, "files[]", function(data)
+                if not data then 
+                    print("^1SCRIPT ERROR: Error while uploadin image to discord")
+                    return p:resolve(false)
+                end 
+                local resp = json.decode(data)
+                if not resp or not resp.attachments then 
+                    print("^1SCRIPT ERROR: Error while uploadin image to discord")
+                    return p:resolve(false)
+                end 
+                local img = resp.attachments[1].proxy_url
+                if not img then 
+                    print("^1SCRIPT ERROR: Error while uploadin image to discord")
+                    return p:resolve(false)
+                end 
+                p:resolve(img)
+            end)
+
+            local image = Citizen.Await(p)
+            if image then 
+                TriggerServerEvent("villamos_vehshop:savePhoto", shop, model, image)
+            end 
+            DeleteEntity(vehicle)
+            SetModelAsNoLongerNeeded(hash)
+        else 
+            print("^1SCRIPT ERROR: Invalid model: "..model)
+        end 
+    end 
+
+    Wait(2000)
+
+    ClearFocus()
+    DisplayHud(true)
+    DisplayRadar(true)
+    FreezeEntityPosition(PlayerPedId(), false)
+    RenderScriptCams(false)
+    DestroyCam(cam, true)
+    SetCamActive(cam, false)
+    Config.Notify(_U("photos_done"))
+    TriggerServerEvent("villamos_vehshop:refresh")
+end)
+
+exports("GeneratePlate", function()
+    local p = promise.new()
+    ESX.TriggerServerCallback('villamos_vehshop:GeneratePlate', function(plate) 
+        p:resolve(plate)
+    end)
+    local plate = Citizen.Await(p)
+    return plate
+end)

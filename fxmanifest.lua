@@ -1,32 +1,36 @@
 fx_version 'adamant'
+
 game 'gta5'
 
-description 'esx vehicleshop by 6osvillamos#9280'
-version '1.0.0'
+lua54 "yes"
 
-ui_page('html/index.html') 
+description 'Vehicleshop by 6osvillamos'
 
-files({
-  'html/index.html',
-  'html/index.js',
-  'html/style.css'
-})
+version '1.1'
 
-shared_script '@es_extended/imports.lua'
+ui_page 'html/index.html'
 
-client_scripts {
-  'config.lua',
-  'client.lua'
+files {
+  'html/**'
+}
+
+shared_scripts {
+  '@es_extended/imports.lua',
+  'config/shared.lua',	
+  '@es_extended/locale.lua',
+	'locales/*.lua'
 }
 
 server_scripts {
   '@mysql-async/lib/MySQL.lua',
-  'config.lua',
+  'config/server.lua',
   'server.lua'
+}
+
+client_scripts {
+  'client.lua'
 }
 
 dependencies {
   'es_extended'
 }
-
-export 'GeneratePlate'

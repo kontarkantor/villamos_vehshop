@@ -1,7 +1,6 @@
 <html>
     <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
         
         <link rel="stylesheet" href="style.css">
         
@@ -9,30 +8,27 @@
     <body>
 		<div id='app'>
             
-            <h1 class="centered label-txt">AUTÓKERESKEDÉS</h1>
-            <div class="centered">
-                <div class="input-group flex-nowrap search">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" id="addon-wrapping"><i class="bi bi-search"></i></span>
-                    </div>
-                    <input type="text" v-model="search" class="form-control" placeholder="autó neve, ára vagy kategóriája" aria-describedby="addon-wrapping">
-                </div>
-            </div>
+            <h1 class="appheader">{{name}}</h1>
 
             <button class="btn close-btn" @click="close()"><i class="bi bi-x-circle"></i></button>
 
-            <div class="d-flex align-content-start flex-wrap car-list">
+            <div class="search-inp">
+                <span class="search-icon"><i class="bi bi-search"></i></span>
+                <input type="text" v-model="search" class="inp" :placeholder="locales.nui_search" aria-describedby="addon-wrapping">
+            </div>
+
+            <div class="car-list">
                 <div v-for="car in filteredList" :key="car.model" class="card car">
-                    <img :src="car.img" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">{{car.label}}</h5>
-                        <p class="card-text">Ár: <strong>{{car.price}}{{currency}}</strong></p>
-                        <p class="card-text">Kategória: <strong>{{car.category}}</strong></p>
-                        <div class="btn-group" role="group" aria-label="First group">
-                            <button type="button" class="btn buy-btn" @click="buy(car.model)"><i class="bi bi-cash"></i> Készpénz</button>
-                            <button v-if="enableBank" type="button" class="btn buy-btn" @click="buybank(car.model)"><i class="bi bi-bank"></i> Bank</button>
-                            <button v-if="enableFaction" type="button" class="btn buy-btn" @click="buyfaction(car.model)"><i class="bi bi-people"></i> Frakció</button>
-                            <button v-if="enableTest" type="button" class="btn buy-btn" @click="test(car.model)"><i class="bi bi-award"></i> Tesztelés</button>
+                    <img :src="car.img" class="car-img" alt="...">
+                    <div class="car-body">
+                        <p class="car-title"><i class="bi bi-car-front"></i> {{car.label}}</p>
+                        <p class="car-text"><i class="bi bi-wallet"></i> {{car.price}}{{locales.nui_currency}}</p>
+                        <p class="car-text"><i class="bi bi-tag"></i> {{car.category}}</p>
+                        <div class="btn-group">
+                            <button v-if="shopdata.money" type="button" class="btn" @click="buy(car.model)" :style="{ 'background-color': haveMoney(car.price, 'money') }"><i class="bi bi-cash"></i> {{locales.nui_cash}}</button>
+                            <button v-if="shopdata.bank" type="button" class="btn" @click="buybank(car.model)" :style="{ 'background-color': haveMoney(car.price, 'bank') }"><i class="bi bi-bank"></i> {{locales.nui_bank}}</button> <br>
+                            <button v-if="shopdata.society" type="button" class="btn" @click="buyfaction(car.model)" :style="{ 'background-color': haveMoney(car.price, 'society') }"><i class="bi bi-people"></i> {{locales.nui_society}}</button>
+                            <button v-if="shopdata.test" type="button" class="btn" @click="test(car.model)" style="background-color: #32a852;"><i class="bi bi-award"></i> {{locales.nui_test}}</button>
                         </div>
                     </div>
                 </div>
@@ -40,7 +36,7 @@
 
 		</div>
 
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.31/vue.global.prod.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.47/vue.global.prod.min.js"></script>
         <script src="index.js"></script>
 
 	</body>
