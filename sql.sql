@@ -15,6 +15,6 @@ CREATE TABLE `vehicles` (
 	`name` VARCHAR(60) NOT NULL,
 	`price` INT(11) NOT NULL,
 	`category` VARCHAR(60) NULL DEFAULT NULL,
-	`image` TEXT NULL DEFAULT NULL
+	`image` TEXT NULL DEFAULT NULL,
 	UNIQUE INDEX `car` (`model`, `shop`) USING BTREE
 );
