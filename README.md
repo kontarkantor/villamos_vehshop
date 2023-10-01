@@ -13,4 +13,4 @@ Hogyha a jobok vagy egyéb más script nem indulna/működne miatta, nevezzétek
 Ha a scripttel szeretnéd elkészíteni a fotókat az autókhoz, szükséged lesz egy discord webhookra, amit a configban tudsz megadni, illetve kell hogy bent legyen a szerveren a screenshot-basic nevű script (https://github.com/citizenfx/screenshot-basic).
 # Marvel Studios
 [Discord](https://discord.gg/esnawXn5q5) <br/>
-[YouTube](https://discord.gg/esnawXn5q5](https://www.youtube.com/channel/UCEluDSZ6Y4fBB8OkKzcVx8A)https://www.youtube.com/channel/UCEluDSZ6Y4fBB8OkKzcVx8A)
+[YouTube](https://www.youtube.com/channel/UCEluDSZ6Y4fBB8OkKzcVx8A)
