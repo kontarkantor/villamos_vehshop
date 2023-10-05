@@ -1,16 +1,25 @@
-# villamos_vehshop
-Egyszere több járműkereskedést támogató NUI-s script.
-# Előnézet
-[előnézet](https://youtu.be/INfQ7QGtoNo)
-# Parancsok (csak adminoknak)
-/vsget <br/>
-/vsadd shop model ár kategória autóneve <br/>
-/vsdel shop model <br/>
+# [ESX] Car dealership (NEW VERSION) | villamos_vehshop
+Vehicle dealership script with NUI, supporting multiple dealerships at once. If you like my work, join our [Discord](https://discord.gg/esnawXn5q5)
+# Preview
+[YouTube](https://youtu.be/INfQ7QGtoNo)
+# Features
+-Multi-Dealerships <br/>
+-Configurable vehicle type (boat, car, airplane, etc.) <br/>
+-Vehicles can be added and removed by commands <br/>
+-Dealerships for factions <br/>
+-Shared job garages (configurable) <br/>
+-Bank, cash and society payment options (configurable) <br/>
+-Vehicle testing <br/>
+-Automatic photo taking of vehicles <br/>
+# Commands (for admins only)
+/vsget
+/vsadd shop model price category carname
+/vsdel shop model
 /vsphoto shop
-# Kompatibilitás
-Hogyha a jobok vagy egyéb más script nem indulna/működne miatta, nevezzétek át nyugodtan esx_vehiclshop-ra a scriptet.
-# Kiegészítők
-Ha a scripttel szeretnéd elkészíteni a fotókat az autókhoz, szükséged lesz egy discord webhookra, amit a configban tudsz megadni, illetve kell hogy bent legyen a szerveren a screenshot-basic nevű script (https://github.com/citizenfx/screenshot-basic).
+# Compatibility
+If jobs or other scripts don't start/work because of it, feel free to rename the script to esx_vehiclshop.
+# Accessories
+If you want to take the photos for the cars with the script, you will need a discord webhook, which you can add in the config, and the screenshot-basic must be in the resources (https://github.com/citizenfx/screenshot-basic).
 # Marvel Studios
 [Discord](https://discord.gg/esnawXn5q5) <br/>
 [YouTube](https://www.youtube.com/channel/UCEluDSZ6Y4fBB8OkKzcVx8A)
