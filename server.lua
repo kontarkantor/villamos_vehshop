@@ -94,7 +94,7 @@ function LogToDiscord(name, identifier, id, model, plate, price, paidwith, image
                 ["icon_url"] = "https://cdn.discordapp.com/attachments/917181033626087454/954753156821188658/marvel1.png"
             },
             ["footer"] = {
-                ["text"] = "villamos_vehshop :)",
+                ["text"] = os.date("%Y-%m-%d %X").." | villamos_vehshop :)",
             },
         }
     }
