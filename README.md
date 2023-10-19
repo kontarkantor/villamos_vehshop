@@ -15,9 +15,9 @@ Vehicle dealership script with NUI, supporting multiple dealerships at once. If 
 -Vehicle testing <br/>
 -Automatic photo taking of vehicles <br/>
 # Commands (for admins only)
-/vsget
-/vsadd shop model price category carname
-/vsdel shop model
+/vsget <br/>
+/vsadd shop model price category carname <br/>
+/vsdel shop model <br/>
 /vsphoto shop
 # Compatibility
 If jobs or other scripts don't start/work because of it, feel free to rename the script to esx_vehiclshop.
