@@ -244,7 +244,7 @@ RegisterCommand("vsget", function(s, a, r)
     Config.Notify(_U("closest_shop", closestshop))
 end)
 
-RegisterNetEvent("villamos_vehshop:takePhotos", function(shop, webhook, cars) 
+RegisterNetEvent("villamos_vehshop:takePhotos", function(shop, apikey, cars) 
     Config.Notify(_U("taking_photos"))
     DisplayHud(false)
     DisplayRadar(false)
@@ -275,19 +275,21 @@ RegisterNetEvent("villamos_vehshop:takePhotos", function(shop, webhook, cars)
             local p = promise.new()
             Wait(500)
 
-            exports['screenshot-basic']:requestScreenshotUpload(webhook, "files[]", function(data)
+            exports['screenshot-basic']:requestScreenshotUpload("https://api.imgbb.com/1/upload?key="..apikey, "image", {
+                encoding = "jpg"
+            }, function(data)
                 if not data then 
-                    print("^1SCRIPT ERROR: Error while uploadin image to discord")
+                    print("^1SCRIPT ERROR: Error while uploading image")
                     return p:resolve(false)
                 end 
                 local resp = json.decode(data)
-                if not resp or not resp.attachments then 
-                    print("^1SCRIPT ERROR: Error while uploadin image to discord")
+                if not resp or not resp.data then 
+                    print("^1SCRIPT ERROR: Error while uploading image")
                     return p:resolve(false)
                 end 
-                local img = resp.attachments[1].proxy_url
+                local img = resp.data.url
                 if not img then 
-                    print("^1SCRIPT ERROR: Error while uploadin image to discord")
+                    print("^1SCRIPT ERROR: Error while uploading image")
                     return p:resolve(false)
                 end 
                 p:resolve(img)
