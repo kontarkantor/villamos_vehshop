@@ -1,4 +1,4 @@
-Config.ImageWebhook = ""
+Config.imgbbAPI = "" -- https://api.imgbb.com/
 Config.LogWebhook = ""
 
 Config.UnknowImage = "http://clipart-library.com/images/8TGb9bdzc.png"
