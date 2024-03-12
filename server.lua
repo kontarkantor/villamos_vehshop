@@ -292,16 +292,16 @@ RegisterCommand("vsphoto", function(source, args, raw)
     if not shop or not Config.Shops[shop] then 
         return Config.Notify(xPlayer.source, _U("invalid_shop"))
     end 
-    if not Config.ImageWebhook or Config.ImageWebhook == "" then 
-        return print("^1SCRIPT ERROR: The Webhook is not setted up to take the pictures")
-    end 
+    if not Config.imgbbAPI or Config.imgbbAPI == "" then 
+        return print("^1SCRIPT ERROR: The imgbb api key is not setted up to take the pictures")
+    end
     if GetResourceState("screenshot-basic") ~= "started" then 
         return print("^1SCRIPT ERROR: screenshot-basic isn't running to take the pictures")
     end 
     local res = MySQL.Sync.fetchAll('SELECT model FROM vehicles WHERE image IS NULL AND shop = @shop', {
         ['@shop'] = shop
     })
-    TriggerClientEvent("villamos_vehshop:takePhotos", xPlayer.source, shop, Config.ImageWebhook, res)
+    TriggerClientEvent("villamos_vehshop:takePhotos", xPlayer.source, shop, Config.imgbbAPI, res)
 end)
 
 RegisterNetEvent("villamos_vehshop:savePhoto", function(shop, model, img)
