@@ -14,6 +14,10 @@ Config.Shops = {
         enablecash = true, 
         enablebank = true,
         enablefaction = false,
+        sell = {
+            coords = vector3(-49.79, -1076.4260, 25.9),
+            pricemultiplier = 0.8,
+        },
         blip = {sprite = 225, color = 0},
         job = false,
         vehtype = "car"
@@ -29,6 +33,7 @@ Config.Shops = {
         enablecash = true, 
         enablebank = true,
         enablefaction = false,
+        sell = false,
         blip = {sprite = 427, color = 3},
         job = false,
         vehtype = "boat"
@@ -44,6 +49,7 @@ Config.Shops = {
         enablecash = false, 
         enablebank = false,
         enablefaction = {"police"}, --police and ambulance can pay from society balance
+        sell = false,
         blip = {sprite = 225, color = 3}, 
         job = {
             ["police"] = {

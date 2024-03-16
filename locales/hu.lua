@@ -1,5 +1,12 @@
 Locales['hu'] = {
     ["open_msg"] = "~INPUT_PICKUP~ a megnyitáshoz: %s",
+    ["sell_msg"] = "~INPUT_PICKUP~ hogy eladd a járműved",
+    ["confirm_sell"] = "Biztosan el akarod adni a járművedet (rendszám: %s) %s$-ért?",
+    ["cant_sell"] = "Ezt a járművet nem adhatod el itt!",
+    ["not_your_car"] = "Ez ne a te járműved!",
+    ["yes"] = "Igen",
+    ["no"] = "Nem",
+    ["selled"] = "Sikeresen eladtad a járművedet %s$-ért!",
     ["test_msg"] = "Hátra van ~p~%s mp~s~ a tesztelésből",
     ["no_shop_near"] = "Nincs a közeledben járműkereskedés!",
     ["closest_shop"] = "A legközelebbi járműkereskedés id-je: %s",

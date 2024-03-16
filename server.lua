@@ -17,6 +17,7 @@ function RefreshCars()
         if veh.shop and Config.Shops[veh.shop] then 
             vehicles[veh.shop][#vehicles[veh.shop]+1] = {
                 model = veh.model,
+                hash = GetHashKey(veh.model),
                 label = veh.name,
                 price = veh.price,
                 category = veh.category,
@@ -49,7 +50,7 @@ end
 
 function GetVehicleData(shop, model)
     for i=1, #vehicles[shop], 1 do
-        if vehicles[shop][i].model == model then 
+        if vehicles[shop][i].model == model or vehicles[shop][i].hash == model then 
             return vehicles[shop][i]
         end 
     end 
@@ -201,6 +202,47 @@ RegisterNetEvent('villamos_vehshop:buyVehicleFaction', function(shop, model)
             LogToDiscord(GetPlayerName(xPlayer.source), xPlayer.identifier, xPlayer.source, model, plate, vehdata.price, 'society_'..xPlayer.job.name, vehdata.img)
         end 
 	end)
+end)
+
+RegisterNetEvent('villamos_vehshop:sellVehicle', function(shop, model, plate)
+    if not vehicles[shop] then return end 
+    local xPlayer = ESX.GetPlayerFromId(source)
+
+    if not IsJobAllowed(Config.Shops[shop].job, xPlayer.job) then return end 
+
+    local ped = GetPlayerPed(xPlayer.source)
+    local veh = GetVehiclePedIsIn(ped, false)
+    local vehmodel = GetEntityModel(veh)
+    local plate = ESX.Math.Trim(GetVehicleNumberPlateText(veh))
+
+    local vehdata = GetVehicleData(shop, vehmodel)
+    if not vehdata then 
+        return Config.Notify(xPlayer.source, _U("cant_sell"))
+    end 
+
+    local price = math.floor(vehdata.price * Config.Shops[shop].sell.pricemultiplier)
+
+    local res = MySQL.Sync.fetchAll('SELECT plate FROM owned_vehicles WHERE plate = @plate AND owner = @owner', {
+        ['@owner'] = xPlayer.identifier,
+        ['@plate'] = plate
+    })
+    
+    if not res[1] then 
+        return Config.Notify(xPlayer.source, _U("not_your_car"))
+    end
+
+    ESX.TriggerClientCallback(xPlayer.source, "villamos_vehshop:confirmSell", function(confirm)
+        if not confirm then return end 
+        local r = MySQL.Sync.execute('DELETE FROM owned_vehicles WHERE plate = @plate AND owner = @owner', {
+            ['@owner'] = xPlayer.identifier,
+            ['@plate'] = plate
+        })
+        if r and r > 0 then 
+            xPlayer.addMoney(price)
+            DeleteEntity(veh)
+            Config.Notify(xPlayer.source, _U("selled", price))
+        end
+    end, plate, price)
 end)
 
 RegisterCommand("vsadd", function(source, args, raw)

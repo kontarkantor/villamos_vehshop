@@ -1,4 +1,5 @@
 local openedShop = false
+local selling = false
 local testing = false
 local shops = {}
 local blips = {}
@@ -24,13 +25,16 @@ CreateThread(function()
     })
     TriggerEvent('chat:addSuggestion', '/vsrefresh', _U("command_vsrefresh"), {})
     TriggerEvent('chat:addSuggestion', '/vsget', _U("command_vsget"), {})
+
+    AddTextEntry('vehshop_sell_msg', _U("sell_msg"))
     
     RefreshShops()
 
     while true do 
         local sleep = 1000
-        local coords = GetEntityCoords(PlayerPedId())
-        if not openedShop then 
+        local ped = PlayerPedId()
+        local coords = GetEntityCoords(ped)
+        if not openedShop and not selling then 
             for shop, data in pairs(shops) do 
                 local dis = #(coords - data.coords)
                 if dis < 20 then 
@@ -42,6 +46,21 @@ CreateThread(function()
                         DisplayHelpTextThisFrame('vehshop_open_msg')
                         if IsControlJustReleased(0, 38) then
                             OpenShop(shop)
+                        end
+                    end 
+                end 
+                if data.sellcoords and IsPedInAnyVehicle(ped) then
+                    local sdis = #(coords - data.sellcoords)
+                    if sdis < 20 then 
+                        sleep = 1 
+                        DrawMarker(6, data.sellcoords, 0.0, 0.0, 0.0, -90.0, 0.0, 0.0, 3.0, 3.0, 3.0, 204, 35, 40, 100, false, true, 2, false, false, false, false)
+                        DrawMarker(36, data.sellcoords+vector3(0.0, 0.0, 0.6), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 204, 35, 40, 100, false, true, 2, false, false, false, false)
+                        if sdis < 2.0 then 
+                            DisplayHelpTextThisFrame('vehshop_sell_msg')
+                            if IsControlJustReleased(0, 38) then
+                                TriggerServerEvent("villamos_vehshop:sellVehicle", shop)
+                                Wait(2000)
+                            end
                         end
                     end 
                 end 
@@ -63,7 +82,7 @@ function RefreshShops()
     shops = {}
     for shop, data in pairs(Config.Shops) do 
         if HaveJob(data.job) then 
-            shops[shop] = { coords = data.coords, label = data.label }
+            shops[shop] = { coords = data.coords, label = data.label, sellcoords = (data.sell and data.sell.coords or false) }
             if data.blip then 
                 local blip = AddBlipForCoord(data.coords)
                 SetBlipSprite(blip, data.blip.sprite)
@@ -317,6 +336,40 @@ RegisterNetEvent("villamos_vehshop:takePhotos", function(shop, apikey, cars)
     SetCamActive(cam, false)
     Config.Notify(_U("photos_done"))
     TriggerServerEvent("villamos_vehshop:refresh")
+end)
+
+ESX.RegisterClientCallback("villamos_vehshop:confirmSell", function(cb, plate, price)
+    selling = true 
+    local eles = {
+        {
+            unselectable = true,
+            icon = "fas fa-info-circle",
+            title = _U("confirm_sell", plate, price),
+        },
+        {
+            icon = "fas fa-check",
+            title = _U("yes"),
+            name = "yes"
+        },
+        {
+            icon = "fas fa-times",
+            title = _U("no"),
+            name = "no"
+        },
+    }
+
+    ESX.OpenContext("right", eles, function(menu, ele)
+        if ele and ele.name and ele.name == "yes" then 
+            cb(true)
+        else 
+            cb(false)
+        end
+        ESX.CloseContext()
+        selling = false 
+    end, function(menu)
+        cb(false)
+        selling = false 
+    end)
 end)
 
 exports("GeneratePlate", function()

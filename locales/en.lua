@@ -1,5 +1,12 @@
 Locales['en'] = {
     ["open_msg"] = "~INPUT_PICKUP~ to open: %s",
+    ["sell_msg"] = "~INPUT_PICKUP~ to sell your vehicle",
+    ["confirm_sell"] = "Are you sure you selling your vehicle with plate %s for %s$?",
+    ["cant_sell"] = "You can't sell this vehicle here!",
+    ["not_your_car"] = "This is not your vehicle!",
+    ["yes"] = "Yes",
+    ["no"] = "No",
+    ["selled"] = "Sucessfully selled your vehicle for %s$!",
     ["test_msg"] = "Testing: ~p~%s seconds~s~ remairing",
     ["no_shop_near"] = "You don't have any vehcileshop near!",
     ["closest_shop"] = "The neraest vehicleshop's id: %s",
