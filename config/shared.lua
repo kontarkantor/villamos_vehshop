@@ -38,6 +38,25 @@ Config.Shops = {
         job = false,
         vehtype = "boat"
     },
+    ["planeshop"] = {
+		label = "Airplane Dealership",
+		coords = vector3(-1622.0938, -3152.4282, 13),
+		outsidecoords = vector4(-1595.5024, -3046.2307, 13.9448, 328.2253),
+		testcoords = vector4(-1735.94, -2926.65, 13.5, 314.81), -- set false to disable testing
+		testtime = 120 * 1000, -- in ms 
+		showroom = vector4(-1271.2113, -3380.5105, 14.5419, 330.0339),
+		showroomcam = vector3(-1248.1279, -3375.4504, 25.6100),
+		enablecash = true, 
+		enablebank = true,
+		enablefaction = false,
+		sell = {
+        coords = vector3(-1645.2725, -3130.7720, 13.9922),
+        pricemultiplier = 0.8,
+    },
+    blip = { sprite = 572, color = 0 },
+    job = false,
+    vehtype = "plane"
+	},
     ["gov_carshop"] = {
         label = "Car dealership for police",
         coords = vector3(457.239563, -1024.813232, 27.520532),
