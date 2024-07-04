@@ -1,6 +1,6 @@
 Config = {}
 
-Config.Locale = "en" -- en, hu
+Config.Locale = "en" -- en, hu, de, fr, pt, ar, es, hi, ru
 
 Config.Shops = {
     ["carshop"] = {
