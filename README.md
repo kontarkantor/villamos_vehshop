@@ -1,4 +1,4 @@
-# [ESX] Car dealership (NEW VERSION) | villamos_vehshop
+# [ESX] Car Dealership (NEW VERSION) | villamos_vehshop
 Vehicle dealership script with NUI, supporting multiple dealerships at once. If you like my work, join our [Discord](https://discord.gg/esnawXn5q5)
 # Marvel Studios
 [Discord](https://discord.gg/esnawXn5q5) <br/>
