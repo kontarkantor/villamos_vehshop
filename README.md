@@ -4,7 +4,7 @@ Vehicle dealership script with NUI, supporting multiple dealerships at once. If 
 [Discord](https://discord.gg/esnawXn5q5) <br/>
 [YouTube](https://www.youtube.com/channel/UCEluDSZ6Y4fBB8OkKzcVx8A)
 # Preview
-[YouTube](https://youtu.be/INfQ7QGtoNo)
+[YouTube](https://youtu.be/INfQ7QGtoNo)<br/>
 [Youtube by redxyz](https://youtu.be/-1QFg7Ju-iQ)
 # Features
 -Multi-Dealerships <br/>
