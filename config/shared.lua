@@ -4,7 +4,7 @@ Config.Locale = "en" -- en, hu, de, fr, pt, ar, es, hi, ru
 
 Config.Shops = {
     ["carshop"] = {
-        label = "Car dealership",
+        label = "Car Dealership",
         coords = vector3(-57.54, -1097.01, 25.5),
         outsidecoords = vector4(-31.0, -1090.7, 26.42, 314.81),
         testcoords = vector4(-1735.94, -2926.65, 13.5, 314.81), -- set false to disable testing
@@ -23,7 +23,7 @@ Config.Shops = {
         vehtype = "car"
     },
     ["boatshop"] = {
-        label = "Boat dealership",
+        label = "Boat Dealership",
         coords = vector3(-753.863708, -1511.775879, 4.016113),
         outsidecoords = vector4(-805.503296, -1504.958252, 0.912793, 104.881889),
         testcoords = vector4(-888.421997, -1565.841797, 0.112793, 144.566910), -- set false to disable testing
@@ -58,7 +58,7 @@ Config.Shops = {
     vehtype = "plane"
 	},
     ["gov_carshop"] = {
-        label = "Car dealership for police",
+        label = "Policecar Dealership",
         coords = vector3(457.239563, -1024.813232, 27.520532),
         outsidecoords = vector4(436.575836, -1022.531860, 28.673218, 85.039368),
         testcoords = false,
