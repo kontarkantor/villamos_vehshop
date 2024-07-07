@@ -36,6 +36,7 @@ Config.Shops = {
         sell = false,
         blip = {sprite = 427, color = 3},
         job = false,
+        marker = 35, --https://docs.fivem.net/docs/game-references/markers/
         vehtype = "boat"
     },
     ["planeshop"] = {
@@ -50,12 +51,13 @@ Config.Shops = {
 		enablebank = true,
 		enablefaction = false,
 		sell = {
-        coords = vector3(-1645.2725, -3130.7720, 13.9922),
-        pricemultiplier = 0.8,
-    },
-    blip = { sprite = 572, color = 0 },
-    job = false,
-    vehtype = "plane"
+            coords = vector3(-1645.2725, -3130.7720, 13.9922),
+            pricemultiplier = 0.8,
+        },
+        blip = { sprite = 572, color = 0 },
+        job = false,
+        marker = 34, --https://docs.fivem.net/docs/game-references/markers/
+        vehtype = "plane"
 	},
     ["gov_carshop"] = {
         label = "Policecar Dealership",
@@ -67,7 +69,7 @@ Config.Shops = {
         showroomcam = vector3(-45.54, -1100.37, 27.42),        
         enablecash = false, 
         enablebank = false,
-        enablefaction = {"police"}, --police and ambulance can pay from society balance
+        enablefaction = {"police"}, 
         sell = false,
         blip = {sprite = 225, color = 3}, 
         job = {

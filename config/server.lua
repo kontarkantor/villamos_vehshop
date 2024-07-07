@@ -1,3 +1,4 @@
+Config.fivemanageAPI = "" -- https://fivemanage.com/
 Config.imgbbAPI = "" -- https://api.imgbb.com/
 Config.LogWebhook = ""
 

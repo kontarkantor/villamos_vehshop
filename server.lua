@@ -334,8 +334,13 @@ RegisterCommand("vsphoto", function(source, args, raw)
     if not shop or not Config.Shops[shop] then 
         return Config.Notify(xPlayer.source, _U("invalid_shop"))
     end 
-    if not Config.imgbbAPI or Config.imgbbAPI == "" then 
-        return print("^1SCRIPT ERROR: The imgbb api key is not setted up to take the pictures")
+    local api
+    if Config.fivemanageAPI and Config.fivemanageAPI ~= "" then 
+        api = {service = "fivemanage", key = Config.fivemanageAPI}
+    elseif Config.imgbbAPI and Config.imgbbAPI ~= "" then 
+        api = {service = "imgbb", key = Config.imgbbAPI}
+    else 
+        return print("^1SCRIPT ERROR: There is no image service setted up in the config to take the pictures")
     end
     if GetResourceState("screenshot-basic") ~= "started" then 
         return print("^1SCRIPT ERROR: screenshot-basic isn't running to take the pictures")
@@ -343,7 +348,7 @@ RegisterCommand("vsphoto", function(source, args, raw)
     local res = MySQL.Sync.fetchAll('SELECT model FROM vehicles WHERE image IS NULL AND shop = @shop', {
         ['@shop'] = shop
     })
-    TriggerClientEvent("villamos_vehshop:takePhotos", xPlayer.source, shop, Config.imgbbAPI, res)
+    TriggerClientEvent("villamos_vehshop:takePhotos", xPlayer.source, shop, api, res)
 end)
 
 RegisterNetEvent("villamos_vehshop:savePhoto", function(shop, model, img)

@@ -23,4 +23,4 @@ Vehicle dealership script with NUI, supporting multiple dealerships at once. If 
 # Compatibility
 If jobs or other scripts don't start/work because of it, feel free to rename the script to esx_vehiclshop.
 # Accessories
-If you want to take the photos for the cars with the script, you will need a imgbb.com API key or a discord webhook, which you can add in the config, and the screenshot-basic must be in the resources (https://github.com/citizenfx/screenshot-basic).
+If you want to take the photos for the cars with the script, you will need a imgbb.com API key or a fivemanage API key, which you can add in the config, and the screenshot-basic must be in the resources (https://github.com/citizenfx/screenshot-basic).

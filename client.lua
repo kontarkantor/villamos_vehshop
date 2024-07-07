@@ -40,7 +40,7 @@ CreateThread(function()
                 if dis < 20 then 
                     sleep = 1
                     DrawMarker(6, data.coords, 0.0, 0.0, 0.0, -90.0, 0.0, 0.0, 2.0, 2.0, 2.0, 0, 155, 20, 100, false, true, 2, false, false, false, false)
-                    DrawMarker(36, data.coords+vector3(0.0, 0.0, 0.6), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0, 155, 20, 100, false, true, 2, false, false, false, false)
+                    DrawMarker((data.marker and data.marker or 36), data.coords+vector3(0.0, 0.0, 0.6), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0, 155, 20, 100, false, true, 2, false, false, false, false)
                     if dis < 2.0 then 
                         AddTextEntry('vehshop_open_msg', _U("open_msg", data.label))
                         DisplayHelpTextThisFrame('vehshop_open_msg')
@@ -54,7 +54,7 @@ CreateThread(function()
                     if sdis < 20 then 
                         sleep = 1 
                         DrawMarker(6, data.sellcoords, 0.0, 0.0, 0.0, -90.0, 0.0, 0.0, 3.0, 3.0, 3.0, 204, 35, 40, 100, false, true, 2, false, false, false, false)
-                        DrawMarker(36, data.sellcoords+vector3(0.0, 0.0, 0.6), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 204, 35, 40, 100, false, true, 2, false, false, false, false)
+                        DrawMarker((data.marker and data.marker or 36), data.sellcoords+vector3(0.0, 0.0, 0.6), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 204, 35, 40, 100, false, true, 2, false, false, false, false)
                         if sdis < 2.0 then 
                             DisplayHelpTextThisFrame('vehshop_sell_msg')
                             if IsControlJustReleased(0, 38) then
@@ -82,7 +82,7 @@ function RefreshShops()
     shops = {}
     for shop, data in pairs(Config.Shops) do 
         if HaveJob(data.job) then 
-            shops[shop] = { coords = data.coords, label = data.label, sellcoords = (data.sell and data.sell.coords or false) }
+            shops[shop] = { coords = data.coords, label = data.label, sellcoords = (data.sell and data.sell.coords or false), marker = data.marker }
             if data.blip then 
                 local blip = AddBlipForCoord(data.coords)
                 SetBlipSprite(blip, data.blip.sprite)
@@ -263,11 +263,23 @@ RegisterCommand("vsget", function(s, a, r)
     Config.Notify(_U("closest_shop", closestshop))
 end)
 
-RegisterNetEvent("villamos_vehshop:takePhotos", function(shop, apikey, cars) 
+RegisterNetEvent("villamos_vehshop:takePhotos", function(shop, api, cars) 
     Config.Notify(_U("taking_photos"))
     DisplayHud(false)
     DisplayRadar(false)
     FreezeEntityPosition(PlayerPedId(), true)
+
+    if not api then 
+        return print("^1SCRIPT ERROR: Invalid API")
+    end 
+    local uploadurl 
+    if api.service == "fivemanage" then 
+        uploadurl = "https://api.fivemanage.com/api/image?apiKey="..api.key
+    elseif api.service == "imgbb" then 
+        uploadurl = "https://api.imgbb.com/1/upload?key="..api.key
+    else
+        return print("^1SCRIPT ERROR: Invalid API")
+    end
 
     local cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
     SetCamCoord(cam, Config.Shops[shop].showroomcam)
@@ -294,7 +306,7 @@ RegisterNetEvent("villamos_vehshop:takePhotos", function(shop, apikey, cars)
             local p = promise.new()
             Wait(500)
 
-            exports['screenshot-basic']:requestScreenshotUpload("https://api.imgbb.com/1/upload?key="..apikey, "image", {
+            exports['screenshot-basic']:requestScreenshotUpload(uploadurl, "image", {
                 encoding = "jpg"
             }, function(data)
                 if not data then 
@@ -302,16 +314,24 @@ RegisterNetEvent("villamos_vehshop:takePhotos", function(shop, apikey, cars)
                     return p:resolve(false)
                 end 
                 local resp = json.decode(data)
-                if not resp or not resp.data then 
-                    print("^1SCRIPT ERROR: Error while uploading image")
-                    return p:resolve(false)
-                end 
-                local img = resp.data.url
-                if not img then 
-                    print("^1SCRIPT ERROR: Error while uploading image")
-                    return p:resolve(false)
-                end 
-                p:resolve(img)
+                if api.service == "fivemanage" then 
+                    if not resp or not resp.url then 
+                        print("^1SCRIPT ERROR: Error while uploading image")
+                        return p:resolve(false)
+                    end 
+                    p:resolve(resp.url)
+                elseif api.service == "imgbb" then 
+                    if not resp or not resp.data then 
+                        print("^1SCRIPT ERROR: Error while uploading image")
+                        return p:resolve(false)
+                    end 
+                    local img = resp.data.url
+                    if not img then 
+                        print("^1SCRIPT ERROR: Error while uploading image")
+                        return p:resolve(false)
+                    end 
+                    p:resolve(img)
+                end
             end)
 
             local image = Citizen.Await(p)
