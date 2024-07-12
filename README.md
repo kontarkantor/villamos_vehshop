@@ -5,7 +5,7 @@ Vehicle dealership script with NUI, supporting multiple dealerships at once. If 
 [YouTube](https://www.youtube.com/channel/UCEluDSZ6Y4fBB8OkKzcVx8A)
 # Preview
 [YouTube](https://youtu.be/INfQ7QGtoNo)<br/>
-[Youtube by redxyz](https://youtu.be/-1QFg7Ju-iQ)
+[Youtube by redxyz](https://www.youtube.com/watch?v=sFvsi1KcgMo)
 # Features
 -Multi-Dealerships <br/>
 -Configurable vehicle type (boat, car, airplane, etc.) <br/>
