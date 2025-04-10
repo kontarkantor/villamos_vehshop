@@ -9,6 +9,8 @@ CREATE TABLE IF NOT EXISTS `owned_vehicles` (
 	PRIMARY KEY (`plate`)
 );
 
+DROP TABLE IF EXISTS `vehicles`;
+
 CREATE TABLE `vehicles` (
 	`model` VARCHAR(60) NOT NULL,
 	`shop` VARCHAR(60) NULL DEFAULT NULL,
